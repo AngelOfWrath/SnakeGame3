@@ -15,15 +15,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Score)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User_Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Match_Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Stat_Id)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -32,15 +23,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Score)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Match_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stat_Id)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

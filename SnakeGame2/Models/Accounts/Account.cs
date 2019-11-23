@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using SnakeGame2.Models.Users;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,11 +13,9 @@ namespace SnakeGame2.Models.Accounts
     {
         public long Id { get; set; }
         [Required]
+        [Remote(action: "VerifyLogin",controller: "Accounts")]
         public string Login { get; set; }
         [Required]
         public string Password { get; set; }
-        [Required]
-
-        public long User_Id { get; set; }
     }
 }

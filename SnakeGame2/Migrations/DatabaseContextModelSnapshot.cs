@@ -23,13 +23,12 @@ namespace SnakeGame2.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Login")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<long>("User_Id")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -53,16 +52,20 @@ namespace SnakeGame2.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("Match_Id")
+                    b.Property<long>("MatchId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("User_Id")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<float>("value")
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Match_stats");
                 });
@@ -73,19 +76,25 @@ namespace SnakeGame2.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("Match_Id")
+                    b.Property<long>("MatchId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("Score")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("Stat_Id")
+                    b.Property<long>("StatId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("User_Id")
+                    b.Property<long>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("StatId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Stats");
                 });
@@ -110,7 +119,7 @@ namespace SnakeGame2.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("Account_Id")
+                    b.Property<long>("AccountId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long?>("MatchId")
@@ -119,18 +128,59 @@ namespace SnakeGame2.Migrations
                     b.Property<long>("User_Nickname")
                         .HasColumnType("INTEGER");
 
-                    b.Property<long>("User_Type_Id")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("MatchId");
 
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SnakeGame2.Models.Mathes_stats.Match_stats", b =>
+                {
+                    b.HasOne("SnakeGame2.Models.Matches.Match", "Match")
+                        .WithMany()
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SnakeGame2.Models.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SnakeGame2.Models.Records.Stats", b =>
+                {
+                    b.HasOne("SnakeGame2.Models.Matches.Match", "Match")
+                        .WithMany()
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SnakeGame2.Models.Stat_types.Stat_type", "Stat")
+                        .WithMany()
+                        .HasForeignKey("StatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SnakeGame2.Models.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SnakeGame2.Models.Users.User", b =>
                 {
+                    b.HasOne("SnakeGame2.Models.Accounts.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SnakeGame2.Models.Matches.Match", null)
                         .WithMany("Players")
                         .HasForeignKey("MatchId");

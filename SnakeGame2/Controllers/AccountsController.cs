@@ -54,7 +54,7 @@ namespace SnakeGame2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Login,Password,User_Id")] Account account)
+        public async Task<IActionResult> Create([Bind("Id,Login,Password")] Account account)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace SnakeGame2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,Login,Password,User_Id")] Account account)
+        public async Task<IActionResult> Edit(long id, [Bind("Id,Login,Password")] Account account)
         {
             if (id != account.Id)
             {
@@ -148,6 +148,13 @@ namespace SnakeGame2.Controllers
         private bool AccountExists(long id)
         {
             return _context.Accounts.Any(e => e.Id == id);
+        }
+
+        public IActionResult VerifyLogin(string login) {
+            if (!_context.VerifyLogin(login)) {
+                return Json($"{login} is aleready in use.");
+            }
+            return Json(true);
         }
     }
 }

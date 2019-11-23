@@ -54,7 +54,7 @@ namespace SnakeGame2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,User_Nickname,User_Type_Id,Account_Id")] User user)
+        public async Task<IActionResult> Create([Bind("Id,User_Nickname")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace SnakeGame2.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,User_Nickname,User_Type_Id,Account_Id")] User user)
+        public async Task<IActionResult> Edit(long id, [Bind("Id,User_Nickname")] User user)
         {
             if (id != user.Id)
             {

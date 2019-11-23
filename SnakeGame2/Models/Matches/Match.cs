@@ -10,7 +10,8 @@ namespace SnakeGame2.Models.Matches
     public class Match
     {
         public long Id { get; set; }
-        [Required]
+        [Display(Name = "Users")]
+        [MatchAttribute(2)]
         public List<User> Players { get; set; }
     }
 }

@@ -25,5 +25,12 @@ namespace SnakeGame2.Data
         public DbSet<Stat_type> Stat_types { get; set; }
         public DbSet<User> Users { get; set; }
 
+        public bool VerifyLogin(string login) {
+            if (Accounts.Where(a => a.Login.Equals(login)).Count() == 0) {
+                return true;
+            }
+            return false;
+        }
+
     }
 }

@@ -27,7 +27,7 @@ namespace SnakeGame2
         {
             services.AddDbContext<DatabaseContext>(options =>
             {
-                options.UseSqlite("Filename=movies.db");
+                options.UseSqlite("Filename=DataBase.db");
             });
             services.AddMvc();
             services.AddControllersWithViews();

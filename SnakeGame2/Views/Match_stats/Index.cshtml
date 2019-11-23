@@ -13,12 +13,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Match_Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User_Id)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.value)
             </th>
             <th></th>
@@ -27,12 +21,6 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Match_Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User_Id)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.value)
             </td>
