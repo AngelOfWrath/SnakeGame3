@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var direction;
+        var previousDirection;
+        //$('#direction').focus();
+        //$('#direction').on('focusout', function () {
+        //    $(this).focus();
+        //});
+        //$('#direction').on('input', function () {
+        window.setInterval(function () {
+            $.ajax({
+                type: 'GET',
+                url: 'getData',
+                success: function (result) {
+                    if (result == "w") {
+                        $('#result').html("/\\");
+                    }
+                    if (result == "s") {
+                        $('#result').html("\\/");
+                    }
+                    if (result == "a") {
+                        $('#result').html("<-");
+                    }
+                    if (result == "d") {
+                        $('#result').html("->");
+                    }
+                    previousDirection = result;
+                }
+            });
+        }, 1000);
+        $(document).on('keypress', function (e) {
+            direction = String.fromCharCode(e.which);
+            if (direction != previousDirection &&
+               ((direction == "w" && previousDirection != "s") ||
+                (direction == "a" && previousDirection != "d") ||
+                (direction == "s" && previousDirection != "w") ||
+                (direction == "d" && previousDirection != "a"))) {
+                $.ajax({
+                    type: 'GET',
+                    url: 'sendData/' + direction
+                });
+            }
+            $(this).val("");
+        });
+        //});
+    });
+</script>
+<div class="text-center">
+    @*<input type="text" id="direction"/>*@
+    <div id="result">text</div>
+</div>
