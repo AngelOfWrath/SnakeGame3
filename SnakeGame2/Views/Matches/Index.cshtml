@@ -23,11 +23,14 @@
             <tr>
                 <td>@item.Id</td>
                 <td>
-                    @foreach (var item1 in @item.Players)
-                    { 
-                        @item1.User_Nickname,
+                    @foreach (var item1 in item.Players)
+                    {
+
+                        <span>@item1.User_Nickname, </span>
+
                     }
-                    </td>
+                </td>
+          
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

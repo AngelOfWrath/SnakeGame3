@@ -2,6 +2,8 @@
     ViewData["Title"] = "Home Page";
 }
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/DataTransfer.js"></script>
 <script>
     $(document).ready(function () {
         var direction;
@@ -11,27 +13,27 @@
         //    $(this).focus();
         //});
         //$('#direction').on('input', function () {
-        window.setInterval(function () {
-            $.ajax({
-                type: 'GET',
-                url: 'getData',
-                success: function (result) {
-                    if (result == "w") {
-                        $('#result').html("/\\");
-                    }
-                    if (result == "s") {
-                        $('#result').html("\\/");
-                    }
-                    if (result == "a") {
-                        $('#result').html("<-");
-                    }
-                    if (result == "d") {
-                        $('#result').html("->");
-                    }
-                    previousDirection = result;
-                }
-            });
-        }, 1000);
+        //window.setInterval(function () {
+        //    $.ajax({
+        //        type: 'GET',
+        //        url: 'getData',
+        //        success: function (result) {
+        //            if (result == "w") {
+        //                $('#result').html("/\\");
+        //            }
+        //            if (result == "s") {
+        //                $('#result').html("\\/");
+        //            }
+        //            if (result == "a") {
+        //                $('#result').html("<-");
+        //            }
+        //            if (result == "d") {
+        //                $('#result').html("->");
+        //            }
+        //            previousDirection = result;
+        //        }
+        //    });
+        //}, 1000);
         $(document).on('keypress', function (e) {
             direction = String.fromCharCode(e.which);
             if (direction != previousDirection &&
@@ -39,10 +41,9 @@
                 (direction == "a" && previousDirection != "d") ||
                 (direction == "s" && previousDirection != "w") ||
                 (direction == "d" && previousDirection != "a"))) {
-                $.ajax({
-                    type: 'GET',
-                    url: 'sendData/' + direction
-                });
+                    connection.invoke("SendData", direction).catch(function (err) {
+                        return console.error(err.toString());
+                    });
             }
             $(this).val("");
         });
