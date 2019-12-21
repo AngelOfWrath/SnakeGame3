@@ -1,0 +1,317 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    td {
+        width: 10px;
+        height: 10px;
+        background-color: #000;
+    }
+
+    .you {
+        background-color: #FF0;
+    }
+
+    .enemy {
+        background-color: #F00;
+    }
+
+    .dead {
+        background-color: #FFF;
+    }
+
+    .apple {
+        background-color: #0F0;
+    }
+
+    .p1, .p2, .p3, .p4 {
+    }
+</style>
+
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <script>
+        $(document).ready(function () {
+            var direction;
+            var previousDirection;
+            var status;
+            var connection = new signalR.HubConnectionBuilder().withUrl("/ControlHub").build();
+            setTimeout(function () {
+                connection.invoke("LogIn","@User.Identity.Name").catch(function (err) {
+                        return console.error(err.toString());
+                });
+            }, 1000);
+            
+            connection.on("Success", function (s) {
+                if (status == "host") {
+                    $("#result").html("Ожидание готовности игроков...");
+                    $("#readyCheck").attr("disabled", true);
+                }
+                else if (status == "player") {
+                    $("#result").html("Ожидание готовности игроков...");
+                }
+                else {
+                    status = s;
+
+                    if (status == "host") {
+                        $("#readyCheck").html("Старт!");
+                        $("#readyCheck").attr("disabled", true);
+                        $("#readyCheck").on("click", function () {
+                            connection.invoke("Start").catch(function (err) {
+                                return console.error(err.toString());
+                            });
+                        });
+                    }
+                    else if (status == "player") {
+                        $("#readyCheck").html("Готов!");
+                        $("#readyCheck").on("click", function () {
+                            connection.invoke("ReadyCheck", "@User.Identity.Name").catch(function (err) {
+                                return console.error(err.toString());
+                            });
+                        });
+                    }
+                }
+            });
+            connection.on("ReadySuccess", function () {
+                if (status == "player") {
+                    if ($("#readyCheck").attr("disabled") == false) {
+                        $("#readyCheck").attr("disabled", true);
+                    }
+                    else {
+                        $("#result").html("Все готовы!");
+                    }
+                }
+                else if (status == "host") {
+                    $("#readyCheck").attr("disabled", false);
+                    $("#result").html("Все готовы!");
+                }
+            });
+            connection.on("Fail", function (s) {
+                status = s;
+            });
+            connection.on("Accepted", function () {
+                
+            });
+            connection.on("Reset", function () {
+                location.reload();
+            });
+            var playerNumber;
+            connection.on("GameStart", function (map, players, directions, alive) {
+                for (var i = 0; i < players.length; i++) {
+                    if (players[i] == "@User.Identity.Name") {
+                        playerNumber = "p" + i;
+                        previousDirection = directions[i];
+                    }
+                }
+                
+                var content = "<table><tablebody>";
+                for (var i = 0; i < map.length; i++) {
+                    if (i % 40 == 0) {
+                        content += "<tr>";
+                    }
+                    if (map[i].indexOf("a") != -1) {
+                        content += "<td class=\"apple\"></td>"
+                    }
+                    else if (map[i].indexOf("p1") != -1) {
+                        content += "<td class=\"p1 ";
+                        if (playerNumber == "p0") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[0]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else if (map[i].indexOf("p2") != -1) {
+                        content += "<td class=\"p2 ";
+                        if (playerNumber == "p1") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[1]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else if (map[i].indexOf("p3") != -1) {
+                        content += "<td class=\"p3 ";
+                        if (playerNumber == "p2") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[2]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else if (map[i].indexOf("p4") != -1) {
+                        content += "<td class=\"p4 ";
+                        if (playerNumber == "p3") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[3]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else {
+                        content += "<td></td>";
+                    }
+                    if (i % 40 == 39) {
+                        content += "</tr>";
+                    }
+                }
+                content += "</tablebody></table>";
+                $("#game").html(content);
+                if (status == "host") {
+                    window.setInterval(function () {
+                        connection.invoke("Update").catch(function (err) {
+                                return console.error(err.toString());
+                        });
+                    }, 333);
+                }
+            });
+            connection.on("RecieveUpdate", function (map, alive) {
+                var content = "<table><tablebody>";
+                for (var i = 0; i < map.length; i++) {
+                    if (i % 40 == 0) {
+                        content += "<tr>";
+                    }
+                    if (map[i].indexOf("a") != -1) {
+                        content += "<td class=\"apple\"></td>"
+                    }
+                    else if (map[i].indexOf("p1") != -1) {
+                        content += "<td class=\"p1 ";
+                        if (playerNumber == "p0") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[0]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else if (map[i].indexOf("p2") != -1) {
+                        content += "<td class=\"p2 ";
+                        if (playerNumber == "p1") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[1]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else if (map[i].indexOf("p3") != -1) {
+                        content += "<td class=\"p3 ";
+                        if (playerNumber == "p2") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[2]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else if (map[i].indexOf("p4") != -1) {
+                        content += "<td class=\"p4 ";
+                        if (playerNumber == "p3") {
+                            content += "you";
+                        }
+                        else {
+                            content += "enemy ";
+                            if (!alive[3]) {
+                                content += "dead";
+                            }
+                        }
+                        content += "\"></td>";
+                    }
+                    else {
+                        content += "<td></td>";
+                    }
+                    if (i % 40 == 39) {
+                        content += "</tr>";
+                    }
+                }
+                content += "</tablebody></table>";
+                $("#game").html(content);
+            });
+            @*connection.on("ReceiveData", function (user,data) {
+                if (user == "@User.Identity.Name") {
+                    if (data == "w") {
+                        $('#result').html("/\\");
+                    }
+                    if (data == "s") {
+                        $('#result').html("\\/");
+                    }
+                    if (data == "a") {
+                        $('#result').html("<-");
+                    }
+                    if (data == "d") {
+                        $('#result').html("->");
+                    }
+                    previousDirection = data;
+                }
+            });*@
+
+            connection.start().then(function () {
+
+            }).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            //window.setInterval(function () {
+            //    alert(status);
+            //}, 1000);
+            $(document).on('keypress', function (e) {
+                direction = String.fromCharCode(e.which);
+                if (direction == "r" && status == "host") {
+                    connection.invoke("Reset").catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                }
+                if (direction != previousDirection &&
+                    ((direction == "w" && previousDirection != "s" && previousDirection != "w") ||
+                        (direction == "a" && previousDirection != "d" && previousDirection != "a") ||
+                        (direction == "s" && previousDirection != "w" && previousDirection != "s") ||
+                        (direction == "d" && previousDirection != "a" && previousDirection != "d"))) {
+                    connection.invoke("SendData","@User.Identity.Name", direction).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    previousDirection = direction;
+                }
+            });
+        });
+    </script>
+    <div class="text-center" id="game">
+        <div id="result">Ожидание готовности игроков...</div>
+        <button type="button" id="readyCheck"></button>
+    </div>
+}
